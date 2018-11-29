@@ -20,7 +20,9 @@
     "fs": "0.0.1-security",
     "graphql": "^14.0.2",
     "graphql-server-express": "^1.4.0",
+    "graphql-subscriptions": "^1.0.0",
     "graphql-tools": "^4.0.3",
+    "http": "0.0.0",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "path": "^0.12.7",
@@ -28,6 +30,7 @@
     "pg-hstore": "^2.3.2",
     "random-string": "^0.2.0",
     "sequelize": "^4.41.2",
+    "subscriptions-transport-ws": "^0.9.15",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

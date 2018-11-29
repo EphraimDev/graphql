@@ -1,5 +1,9 @@
 export default `
 
+    type Subscription {
+      userAdded: User!
+    }
+
     type Profile {
         profileId: String!
         picture: String!
@@ -47,6 +51,13 @@ export default `
         createProfile(userId: String, picture: String, address: String!, state: String!, city: String!, zip: Int!): Profile
         updateProfile(profileId: String!): [Int!]!
         createArticle(title: String!, image: String!, article: String!): Article!
+        createUser(email: String!): User!
+    }
+
+    schema {
+      query: Query
+      mutation: Mutation
+      subscription: Subscription
     }
 `; 
 /* import {

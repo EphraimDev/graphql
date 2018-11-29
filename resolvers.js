@@ -3,6 +3,9 @@ import UUID from 'uuid';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+import { PubSub } from 'graphql-subscriptions';
+
+export const pubsub = new PubSub()
 
 const userToken = randomString({
   length: 8,
@@ -13,7 +16,14 @@ const userToken = randomString({
 
 const uuidv4 = UUID.v4();
 
+const USER_ADDED = 'USER_ADDED';
+
 export default {
+  Subscription: {
+    userAdded: {
+      subscribe: () => pubsub.asyncIterator(USER_ADDED)
+    },
+  },
   User: {
     profile: ({userId}, args, {models}) => models.Profiles.findAll({
       where: {
@@ -50,6 +60,16 @@ export default {
   },
  
   Mutation: {
+    createUser: async (parent, args, {models}) => {
+      const user = args;
+      //user.password = await bcrypt.hash(user.password, 10);
+      user.password = 'idk';
+      const userAdded = await models.Users.create(user);
+      pubsub.publish(USER_ADDED, {
+        userAdded
+      });
+      return userAdded
+    },
     register: async (parent, args, { models }) => {
       const user = args;
       user.token = userToken
@@ -73,7 +93,7 @@ export default {
           throw new Error('No user with that email')
         }
 
-        bcrypt.compare(password, user.password)
+         bcrypt.compare(password, user.password)
         .then(valid => {
           if(!valid) {
             throw new Error('Incorrect password');
@@ -87,14 +107,13 @@ export default {
             {
               expiresIn: '1y'
             }
-          )
+          );
           const myToken = token;
           console.log(token);
           return myToken
 
         })
         .catch(err => {
-          console.log('jwt')
           throw new Error('jwt did not work')
         })
         
