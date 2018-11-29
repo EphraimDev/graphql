@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { PubSub } from 'graphql-subscriptions';
+import { requiresAdmin, requiresAuth } from './permissions';
 
 export const pubsub = new PubSub()
 
@@ -101,7 +102,7 @@ export default {
     
           const token = jwt.sign(
             {
-              user: _.pick(user, ['userId', 'email'])
+              user: _.pick(user, ['userId', 'email', 'isAdmin'])
             },
             SECRET,
             {
@@ -129,10 +130,9 @@ export default {
     }, { models }) => models.Profiles.create({
       address, city, state, zip, userId, profileId: uuidv4
     }),
-    createArticle: (parent, {
-      title, image, article,
-    }, { models }) => models.Articles.create({
-      title, image, article
-    }),
+    createArticle: requiresAdmin.createResolver((parent, 
+      //{title, image, article,},
+      args, 
+      { models }) => models.Articles.create(args)),
   },
 };

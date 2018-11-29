@@ -16,6 +16,10 @@ export default (sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    isAdmin: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    },
     email: {
       type: Sequelize.STRING,
       allowNull: false,

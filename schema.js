@@ -44,7 +44,7 @@ export default `
     }
 
     type Mutation {
-        register(firstname: String!, lastname: String!, email: String!, password: String!): User
+        register(firstname: String!, lastname: String!, email: String!, password: String!, isAdmin: Boolean): User
         login(email: String!, password: String!): String!
         updateUser(userId: String!): [Int!]!
         deleteUser(userId: String!): Int!
