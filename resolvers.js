@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { PubSub } from 'graphql-subscriptions';
 import { requiresAdmin, requiresAuth } from './permissions';
+import {refreshTokens, tryLogin} from './auth';
 
 export const pubsub = new PubSub()
 
@@ -86,7 +87,14 @@ export default {
         throw new Error('User already exists');
       }
     },
-    login: async (parent, {email, password}, {models, SECRET}) => {
+    login: async (parent, {email, password}, {models, SECRET}) =>
+      tryLogin(email, password, models, SECRET),
+      refreshTokens: async (
+        parent,
+        {token,refreshToken},
+        {models, SECRET},
+      ) => refreshTokens(token, refreshToken, models, SECRET),
+    /*login: async (parent, {email, password}, {models, SECRET}) => {
       models.Users.findOne({where:{email}})
       .then(user => {
         if(!user) {
@@ -122,7 +130,7 @@ export default {
       .catch(err => {
         throw new Error('Login failed')
       })
-    },
+    },*/
     updateUser: (parent, args, { models }) => models.Users.update({ args }),
     deleteUser: (parent, args, { models }) => models.Users.destroy({ where: args }),
     createProfile: (parent, {

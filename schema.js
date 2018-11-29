@@ -35,6 +35,11 @@ export default `
         profile: [Profile!]!
     }
 
+    type AuthPayload {
+      token: String!
+      refreshToken: String!
+    }
+
     type Query {
         allUsers: [User!]!
         me: User
@@ -52,6 +57,7 @@ export default `
         updateProfile(profileId: String!): [Int!]!
         createArticle(title: String!, image: String!, article: String!): Article!
         createUser(email: String!): User!
+        refreshTokens(token: String!, refreshToken: String!): AuthPayload
     }
 
     schema {
