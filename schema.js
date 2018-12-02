@@ -7,9 +7,6 @@ export default `
     type Profile {
         profileId: String!
         picture: String!
-        packages_bought: String!
-        courses_taken: String!
-        investment: String!
         address: String!
         state: String!
         city: String!
@@ -22,6 +19,16 @@ export default `
         title: String!
         image: String!
         article: String!
+        comments: [Comment!]!
+    }
+
+    type Comment {
+      commentId: String!
+      name: String!
+      comment: String!
+      email: String!
+      articleId: String!
+      userId: String!
     }
 
     type User {
@@ -32,7 +39,9 @@ export default `
         confirmed: Boolean!
         token: String!
         userId: String!
+        isAdmin: Boolean!
         profile: [Profile!]!
+        comments: [Comment!]!
     }
 
     type AuthPayload {
@@ -56,6 +65,7 @@ export default `
         createProfile(userId: String, picture: String, address: String!, state: String!, city: String!, zip: Int!): Profile
         updateProfile(profileId: String!): [Int!]!
         createArticle(title: String!, image: String!, article: String!): Article!
+        createComment(userId: String!, name: String!, comment: String!, email: String!, articleId: String!): Comment!
         createUser(email: String!): User!
         refreshTokens(token: String!, refreshToken: String!): AuthPayload
     }

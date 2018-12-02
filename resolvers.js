@@ -29,10 +29,34 @@ export default {
   User: {
     profile: ({userId}, args, {models}) => models.Profiles.findAll({
       where: {
-        userId: userId
+        userId
       }
-    })
+    }),
+    comments: ({userId}, args, {models}) => {
+      models.Comments.findAll({
+        where: {
+          userId
+        }
+      })
+    }
   },
+
+  Article: {
+    comments: ({articleId}, args, {commentLoader}) => 
+    commentLoader.load(articleId)
+  },
+
+  // Comment: {
+  //   creator: ({id}, args, {models}) => {
+  //     console.log(1)
+  //     return models.Users.findOne({
+  //       where: {
+  //         userId: id
+  //       }
+  //     })
+  //   },
+  // },
+
   Query: {
     allUsers: (parent, args, { models }) => models.Users.findAll(),
     me: (parent, args, { models, user }) => {
@@ -89,58 +113,39 @@ export default {
     },
     login: async (parent, {email, password}, {models, SECRET}) =>
       tryLogin(email, password, models, SECRET),
-      refreshTokens: async (
-        parent,
-        {token,refreshToken},
-        {models, SECRET},
-      ) => refreshTokens(token, refreshToken, models, SECRET),
-    /*login: async (parent, {email, password}, {models, SECRET}) => {
-      models.Users.findOne({where:{email}})
-      .then(user => {
-        if(!user) {
-          console.log('error')
-          throw new Error('No user with that email')
-        }
-
-         bcrypt.compare(password, user.password)
-        .then(valid => {
-          if(!valid) {
-            throw new Error('Incorrect password');
-          }
-    
-          const token = jwt.sign(
-            {
-              user: _.pick(user, ['userId', 'email', 'isAdmin'])
-            },
-            SECRET,
-            {
-              expiresIn: '1y'
-            }
-          );
-          const myToken = token;
-          console.log(token);
-          return myToken
-
-        })
-        .catch(err => {
-          throw new Error('jwt did not work')
-        })
-        
-      })
-      .catch(err => {
-        throw new Error('Login failed')
-      })
-    },*/
+    refreshTokens: async (parent, {token,refreshToken}, {models, SECRET}) => 
+      refreshTokens(token, refreshToken, models, SECRET),
     updateUser: (parent, args, { models }) => models.Users.update({ args }),
     deleteUser: (parent, args, { models }) => models.Users.destroy({ where: args }),
-    createProfile: (parent, {
+    createProfile: requiresAuth.createResolver((parent, {
       address, city, state, zip, userId
     }, { models }) => models.Profiles.create({
       address, city, state, zip, userId, profileId: uuidv4
-    }),
+    })),
     createArticle: requiresAdmin.createResolver((parent, 
       //{title, image, article,},
       args, 
       { models }) => models.Articles.create(args)),
+    createComment: requiresAuth.createResolver((parent, 
+      //{title, image, article,},
+      args, 
+      { models }) => {
+        const comment = args;
+        console.log(comment)
+        models.Articles.findOne({
+        where: {
+          articleId: comment.articleId
+        }
+      })
+      .then(article => {
+        console.log(article)
+        if(!article) {
+          throw new Error('Article does not exist')
+        }
+        return models.Comments.create(comment)
+      })
+    }),
+        
+        
   },
 };

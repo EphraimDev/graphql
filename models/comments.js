@@ -30,6 +30,16 @@ export default (sequelize) => {
         key: 'articleId',
         as: 'articleId',
       },
+      userId: {
+        type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'userId',
+          as: 'userId',
+        }
+      }
     },
   }, {});
   return Comments;

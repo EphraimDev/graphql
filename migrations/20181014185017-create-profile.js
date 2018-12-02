@@ -12,21 +12,6 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true
         },
-        packages_bought: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          defaultValue: 0
-        },
-        courses_taken: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          defaultValue: 0
-        },
-        investment: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          defaultValue: 0
-        },
         address: {
           type: Sequelize.STRING,
           allowNull: true

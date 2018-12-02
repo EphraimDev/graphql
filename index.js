@@ -7,10 +7,15 @@ import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
+import DataLoader from 'dataloader';
+import _ from 'lodash';
+import passport from 'passport';
+import FacebookStrategy from 'passport-facebook';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import models from './models';
+import {refreshTokens} from './auth';
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -21,13 +26,37 @@ const SECRET = 'mysecret';
 
 const app = express();
 
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET,
+  callbackURL: "https://57ddb062.ngrok.io/auth/facebook/callback"
+  },
+  (accessToken, refreshToken, profile, cb) => {
+    console.log(profile)
+    cb(null, profile)
+  } 
+));
+
+app.use(passport.initialize());
+
+app.get('/flogin', passport.authenticate('facebook'));
+ 
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { session: false }),
+  (req, res) => {
+    res.send('Aunthenticated');
+  });
+app.get('/', (req,res)=> {
+  res.json({
+    1:1
+  })
+})
 const addUser = async (req, res, next) => {
   const token = req.headers['x-token'];
   if(token) {
     try {
       const {user} = await jwt.verify(token, SECRET);
       req.user = user
-  
     } catch (err) {
       const refreshToken = req.headers['x-refresh-token'];
       const newTokens = await refreshTokens(
@@ -57,6 +86,20 @@ app.use(
   }),
 );
 
+const batchComments = async (keys, {Comment}) => {
+  const comments = await Comment.findAll({
+    raw: true,
+    where: {
+      articleId: {
+        $in: keys
+      }
+    }
+  });
+  const gs = _.groupBy(comments, articleId);
+
+  return keys.map(k => gs[k] || [])
+}
+
 app.use('/graphql',
   bodyParser.json(),
   graphqlExpress(req => ({
@@ -64,7 +107,8 @@ app.use('/graphql',
     context: {
       models,
       SECRET,
-      user: req.user
+      user: req.user,
+      commentLoader: new DataLoader(keys => batchComments(keys, models)),
     }
   }))
 );

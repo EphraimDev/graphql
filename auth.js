@@ -2,12 +2,12 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
 
-const createTokens = async (user, secret) => {
+const createTokens = async (user, SECRET) => {
     const createToken = jwt.sign(
         {
             user: _.pick(user, ['userId', 'isAdmin']),
         },
-        secret,
+        SECRET,
         {
             expiresIn: '20m',
         },
@@ -17,7 +17,7 @@ const createTokens = async (user, secret) => {
         {
             user: _.pick(user, 'userId'),
         },
-        secret,
+        SECRET,
         {
             expiresIn: '7d',
         },
@@ -35,7 +35,7 @@ export const refreshTokens = async (token, refreshToken, models, SECRET) => {
         return {};
     }
 
-    const user = await models.Users.findOne({where:{email}, raw: true});
+    const user = await models.Users.findOne({where:{userId: id}, raw: true});
 
     const [newToken, newRefreshToken] = await createTokens(user, SECRET);
     return {
@@ -49,6 +49,12 @@ export const tryLogin = async (email, password, models, SECRET) => {
     const user = await models.Users.findOne({where:{email}, raw: true});
     if(!user) {
         //user with provided email not found
+        throw new Error('Invalid login');
+    }
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+        // bad password
         throw new Error('Invalid login');
     }
 
