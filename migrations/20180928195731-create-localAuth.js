@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('LocalAuth', {
+    return queryInterface.createTable('local_auths', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true
@@ -35,6 +35,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('LocalAuth');
+    return queryInterface.dropTable('local_auths');
   }
 };

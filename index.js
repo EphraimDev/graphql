@@ -36,12 +36,10 @@ passport.use(new FacebookStrategy({
     // Case 1: First time login
     //Case 2: other times
     const {id, displayName} = profile;
-    console.log(id)
     const fbUsers = await models.fb_auths.findAll({
       Limit: 1,
       where: {fbId: id},
     });
-    console.log(fbUsers);
     if(!fbUsers.length) {
       const user = await models.Users.create();
       const fbUser = await models.fb_auths.create({

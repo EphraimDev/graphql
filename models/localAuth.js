@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 
 export default (sequelize) => {
-  const LocalAuth = sequelize.define('LocalAuth', {
+  const LocalAuth = sequelize.define('local_auths', {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true
