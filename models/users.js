@@ -8,34 +8,13 @@ export default (sequelize) => {
       allowNull: false,
       defaultValue: Sequelize.UUIDV4,
     },
-    firstname: {
+    username: {
       type: Sequelize.STRING,
-      allowNull: false,
-    },
-    lastname: {
-      type: Sequelize.STRING,
-      allowNull: false,
+      unique: true,
     },
     isAdmin: {
       type: Sequelize.BOOLEAN,
       defaultValue: false
-    },
-    email: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    confirmed: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false,
-    },
-    token: {
-      type: Sequelize.STRING,
-      allowNull: false,
     },
   }, {});
   Users.associate = (models) => {
@@ -44,13 +23,8 @@ export default (sequelize) => {
       foreignKey: 'userId',
       as: 'Profiles',
     });
-    Users.hasMany(models.Trainings, {
+    Users.hasMany(models.Articles, {
       foreignKey: 'userId',
-      as: 'Trainings',
-    });
-    Users.hasMany(models.ProductsBought, {
-      foreignKey: 'userId',
-      as: 'ProductsBought',
     });
     Users.hasMany(models.Comments, {
       foreignKey: 'userId',
