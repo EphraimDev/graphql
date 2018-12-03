@@ -59,7 +59,7 @@ export default `
 
     type Mutation {
         register(firstname: String!, lastname: String!, email: String!, password: String!, isAdmin: Boolean): User
-        login(email: String!, password: String!): String!
+        login(email: String!, password: String!): AuthPayload!
         updateUser(userId: String!): [Int!]!
         deleteUser(userId: String!): Int!
         createProfile(userId: String, picture: String, address: String!, state: String!, city: String!, zip: Int!): Profile

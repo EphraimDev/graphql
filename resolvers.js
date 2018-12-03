@@ -97,19 +97,27 @@ export default {
       return userAdded
     },
     register: async (parent, args, { models }) => {
-      const user = args;
-      user.token = userToken
-      const foundUser = await models.Users.findOne({
-        where: {
-          email: user.email
-        }
+      const user = _.pick(args, ['fullname', 'isAdmin']);
+      const localAuth = _.pick(args, ['email', 'password'])
+      const passwordPromise = bcrypt.hash(localAuth.password, 10);
+      const createUserPromise = models.Users.create(user);
+      const [password, createdUser] = await Promise.all([passwordPromise, createUserPromise]);
+      localAuth.password = password;
+      return models.local_auths.create({
+        ...localAuth,
+        userId: createdUser.userId
       });
-      if(!foundUser) {
-        user.password = await bcrypt.hash(user.password, 10);
-        return models.Users.create(user)
-      } else {
-        throw new Error('User already exists');
-      }
+      // const foundUser = await models.Users.findOne({
+      //   where: {
+      //     email: user.email
+      //   }
+      // });
+      // if(!foundUser) {
+      //   user.password = await bcrypt.hash(user.password, 10);
+      //   return models.Users.create(user)
+      // } else {
+      //   throw new Error('User already exists');
+      // }
     },
     login: async (parent, {email, password}, {models, SECRET}) =>
       tryLogin(email, password, models, SECRET),

@@ -9,6 +9,7 @@ export default (sequelize) => {
     email: {
       type: Sequelize.STRING,
       unique: true,
+      primaryKey: true
     },
     password: {
       type: Sequelize.STRING,

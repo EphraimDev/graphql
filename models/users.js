@@ -8,7 +8,7 @@ export default (sequelize) => {
       allowNull: false,
       defaultValue: Sequelize.UUIDV4,
     },
-    username: {
+    fullname: {
       type: Sequelize.STRING,
       unique: true,
     },

@@ -6,7 +6,11 @@ module.exports = {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false,
-        defaultValue: Sequelize.UUIDV4
+        defaultValue: Sequelize.UUIDV4,
+      },
+      fullname: {
+        type: Sequelize.STRING,
+        unique: true,
       },
       isAdmin: {
         type: Sequelize.BOOLEAN,
